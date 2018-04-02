@@ -16,6 +16,8 @@ from util import get_args, makedirs
 args = get_args()
 torch.cuda.set_device(args.gpu)
 
+USE_CUDA = True if args.gpu > 0 else False
+
 inputs = data.Field(lower=args.lower)
 answers = data.Field(sequential=False)
 
@@ -49,7 +51,8 @@ else:
     model = SNLIClassifier(config)
     if args.word_vectors:
         model.embed.weight.data = inputs.vocab.vectors
-        model.cuda()
+        if USE_CUDA:
+            model.cuda()
 
 criterion = nn.CrossEntropyLoss()
 opt = O.Adam(model.parameters(), lr=args.lr)
